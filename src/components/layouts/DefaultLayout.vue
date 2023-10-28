@@ -20,7 +20,7 @@
 <style lang="scss">
 .default-layout {
   &__header {
-    background-color: #181818;
+    background-color: #000;
   }
 }
 </style>

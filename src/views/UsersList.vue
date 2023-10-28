@@ -8,7 +8,7 @@
         :prefix-icon="Search"
         placeholder="Type to search"
         input-style="max-width: 400px"
-        style="--el-input-focus-border-color: #181818"
+        style="--el-input-focus-border-color: #000"
       />
     </div>
 
@@ -120,7 +120,7 @@ async function toUserDetails(data: object) {
   height: 100%;
   background-color: #e5e5e5;
   .el-table {
-    --el-table-header-text-color: #181818;
+    --el-table-header-text-color: #000;
   }
 
   .el-pagination {

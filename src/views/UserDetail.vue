@@ -31,7 +31,7 @@
           </el-form-item>
           <div class="user-detail__action-buttons">
             <el-button type="info" @click="toUsersList">Back</el-button>
-            <el-button type="primary" color="#181818" @click="submitForm(formRef)">Save</el-button>
+            <el-button type="primary" color="#000" @click="submitForm(formRef)">Save</el-button>
           </div>
         </el-form>
       </el-card>

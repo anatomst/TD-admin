@@ -17,7 +17,7 @@ const { avatar } = toRefs(state)
 </script>
 <style lang="scss">
 .default-header {
-  background-color: #181818;
+  background-color: #000;
   height: 100%;
   padding: 0 20px;
   display: flex;

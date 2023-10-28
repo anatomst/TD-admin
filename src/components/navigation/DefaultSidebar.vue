@@ -5,7 +5,7 @@
     </div>
     <el-menu
       active-text-color="#ff0000"
-      background-color="#181818"
+      background-color="#000"
       class="el-menu-vertical-demo"
       default-active="1"
       text-color="#fff"
@@ -32,7 +32,7 @@ import logoIcon from '@/assets/icons/logo.svg'
 .default-sidebar {
   min-height: 100vh;
   height: 100%;
-  background-color: #181818;
+  background-color: #000;
 
   &__logo {
     padding: 20px 0;
