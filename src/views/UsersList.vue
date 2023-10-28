@@ -146,8 +146,7 @@ const toUserDetails = async (data: object) => {
   .example-pagination-block {
     display: flex;
     justify-content: end;
-    margin-top: 20px;
-    margin-right: 20px;
+    margin: 20px;
   }
 }
 </style>
