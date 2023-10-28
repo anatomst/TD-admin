@@ -30,8 +30,10 @@
             <el-input v-model="user.email" input-style="width: 600px"></el-input>
           </el-form-item>
           <div class="user-detail__action-buttons">
-            <el-button type="info" @click="toUsersList">Back</el-button>
-            <el-button type="primary" color="#000" @click="submitForm(formRef)">Save</el-button>
+            <el-button round size="large" type="info" @click="toUsersList">Back</el-button>
+            <el-button round size="large" type="primary" color="#000" @click="submitForm(formRef)"
+              >Save</el-button
+            >
           </div>
         </el-form>
       </el-card>
