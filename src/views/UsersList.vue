@@ -74,11 +74,9 @@ const search = ref('')
 const tableLayout = ref('auto')
 const users = ref([])
 
-onMounted(async () => {
-  await loadUsers()
-})
+onMounted(loadUsers)
 
-const loadUsers = async () => {
+async function loadUsers() {
   const localUsers = getItem('users')
   const localMeta = getItem('meta')
 
@@ -98,18 +96,18 @@ const filterTableData = computed(() =>
   )
 )
 
-const handlePageChange = async (newPage: number) => {
+async function handlePageChange(newPage: number) {
   currentPage.value = newPage
   setItem('users', undefined)
   await loadUsers()
 }
 
-const deleteUser = async (id: number) => {
+async function deleteUser(id: number) {
   users.value = users.value.filter((user) => user.id !== id)
   ElMessage.success('User successfully deleted')
 }
 
-const toUserDetails = async (data: object) => {
+async function toUserDetails(data: object) {
   setItem('chosenUser', data)
   await store.commit('usersStore/SET_USER', data)
   await router.push(`/users/${data.id}`)

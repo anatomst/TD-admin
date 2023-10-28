@@ -1,10 +1,10 @@
 import axios from 'axios'
-import { type UserState, type User, type userDetailType, type Meta } from './types'
+import type { UserState, User, Meta } from './types'
 
 const state: UserState = {
   users: [],
   meta: {} as Meta,
-  userDetail: {} as userDetailType
+  userDetail: {} as User
 }
 
 const mutations = {
@@ -17,7 +17,7 @@ const mutations = {
   DELETE_USER(state: UserState, id: number) {
     state.users = state.users.filter((item: User) => item.id !== id)
   },
-  SET_USER(state: UserState, userDetail: userDetailType) {
+  SET_USER(state: UserState, userDetail: User) {
     state.userDetail = userDetail
   },
   UPDATE_USER(state: UserState, user: User) {

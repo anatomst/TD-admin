@@ -43,23 +43,23 @@
 import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useStore } from 'vuex'
-import { ElMessage, FormInstance } from 'element-plus'
+import { ElMessage, type FormInstance } from 'element-plus'
 import { getItem, setItem } from '@/helpers/persistanceStorage'
+import type { User } from '@/store/modules/users/types'
 
 const route = useRoute()
 const router = useRouter()
 const store = useStore()
 
 const userId = route.params.id
-const user = ref({})
+const user = ref({} as User)
 const isLoading = ref(false)
 const formRef = ref<FormInstance>()
 const users = ref(getItem('users') || [])
 
-onMounted(async () => {
-  await loadUser()
-})
-const loadUser = async () => {
+onMounted(loadUser)
+
+async function loadUser() {
   let localUser = getItem('chosenUser')
 
   if (localUser === null || localUser.id != userId) {
@@ -74,13 +74,13 @@ const loadUser = async () => {
   }
 }
 
-const submitForm = (formEl: FormInstance | undefined) => {
+function submitForm(formEl: FormInstance | undefined) {
   if (!formEl) return
   formEl.validate((valid) => {
     if (valid) {
-      let updatedUserList = users.value.map((item) => {
-        return item.id === user.value.id ? user.value : item
-      })
+      let updatedUserList = users.value.map((item: User) =>
+        item.id === user.value.id ? user.value : item
+      )
       setItem('chosenUser', user.value)
       setItem('users', updatedUserList)
       store.commit('usersStore/UPDATE_USER', user.value)
@@ -92,7 +92,7 @@ const submitForm = (formEl: FormInstance | undefined) => {
   })
 }
 
-const toUsersList = async () => {
+async function toUsersList() {
   await router.push('/users')
 }
 </script>

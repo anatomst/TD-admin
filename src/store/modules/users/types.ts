@@ -1,6 +1,6 @@
 export interface UserState {
   users: User[]
-  userDetail: userDetailType
+  userDetail: User
   meta: Meta
 }
 
@@ -17,12 +17,4 @@ export interface Meta {
   total: number
   total_pages: number
   per_page: number
-}
-
-export interface userDetailType {
-  id: number
-  first_name: string
-  last_name: string
-  email: string
-  avatar: string
 }
