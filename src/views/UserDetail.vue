@@ -2,7 +2,7 @@
   <div class="user-detail">
     <h1 class="user-detail__title">User Details</h1>
     <div class="user-detail__card">
-      <el-card v-loading="isLoading">
+      <el-card>
         <el-form class="user-detail__card-info" ref="formRef" :model="user" label-width="90px">
           <img :src="user.avatar" alt="photo" class="img" height="200" />
           <el-form-item label="First Name">
@@ -42,37 +42,27 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import { ElMessage, type FormInstance } from 'element-plus'
-import { getItem, setItem } from '@/helpers/persistanceStorage'
-import type { User } from '@/store/modules/users/types'
 
 const route = useRoute()
 const router = useRouter()
 const store = useStore()
 
 const userId = route.params.id
-const user = ref({} as User)
-const isLoading = ref(false)
+const user = computed(() => store.state.usersStore.userDetail)
 const formRef = ref<FormInstance>()
-const users = ref(getItem('users') || [])
 
 onMounted(loadUser)
 
 async function loadUser() {
-  let localUser = getItem('chosenUser')
+  let localUser = await store.dispatch('usersStore/loadLocalUser', userId)
 
-  if (localUser === null || localUser.id != userId) {
-    isLoading.value = true
-    await store.dispatch('usersStore/getUser', userId)
-    user.value = store.state.usersStore.userDetail
-    setItem('chosenUser', store.state.usersStore.userDetail)
-    isLoading.value = false
-  } else {
-    user.value = localUser
-    store.commit('usersStore/SET_USER', localUser)
+  if (!localUser) {
+    ElMessage.error('No user found with such id')
+    await router.push('/users')
   }
 }
 
@@ -80,12 +70,7 @@ function submitForm(formEl: FormInstance | undefined) {
   if (!formEl) return
   formEl.validate((valid) => {
     if (valid) {
-      let updatedUserList = users.value.map((item: User) =>
-        item.id === user.value.id ? user.value : item
-      )
-      setItem('chosenUser', user.value)
-      setItem('users', updatedUserList)
-      store.commit('usersStore/UPDATE_USER', user.value)
+      store.dispatch('usersStore/updateLocalUser', user.value)
       ElMessage.success('User successfully updated')
     } else {
       ElMessage.error('Error')

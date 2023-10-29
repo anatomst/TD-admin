@@ -1,72 +1,61 @@
-import axios from 'axios'
-import type { UserState, User, Meta } from './types'
+import axios, { type AxiosResponse } from 'axios'
+import type { UserState, User } from './types'
 
 const state: UserState = {
-  users: [],
-  meta: {} as Meta,
+  users: [] as User[],
   userDetail: {} as User
 }
 
 const mutations = {
   SET_USERS(state: UserState, users: User[]) {
     state.users = users
-  },
-  SET_META(state: UserState, meta: Meta) {
-    state.meta = meta
-  },
-  DELETE_USER(state: UserState, id: number) {
-    state.users = state.users.filter((item: User) => item.id !== id)
-  },
-  SET_USER(state: UserState, userDetail: User) {
-    state.userDetail = userDetail
-  },
-  UPDATE_USER(state: UserState, user: User) {
-    state.userDetail = user
   }
 }
 
+// Make here 2 requests because query param 'per_page' is not working on server
 const actions = {
-  async getUsersList({ commit }: { commit: Function }, page: number) {
+  async getUsersList({ commit }: { commit: Function }) {
     try {
-      const response = await axios.get(`https://reqres.in/api/users?page=${page}?per_page=12`)
-      commit('SET_USERS', response.data.data)
-      commit('SET_META', {
-        page: response.data.page,
-        total: response.data.total,
-        total_pages: response.data.total_pages,
-        per_page: response.data.per_page
-      })
+      const response1: AxiosResponse = await axios.get(`https://reqres.in/api/users?page=1`)
+      const response2: AxiosResponse = await axios.get(`https://reqres.in/api/users?page=2`)
+      const usersList: User[] = [...response1.data.data, ...response2.data.data]
+
+      commit('SET_USERS', usersList)
+      localStorage.setItem('users', JSON.stringify(usersList))
     } catch (error) {
       console.error('Get users error', error)
     }
   },
-  async getUser({ commit }: { commit: Function }, id: number) {
-    try {
-      const response = await axios.get(`https://reqres.in/api/users/${id}`)
-      commit('SET_USER', response.data.data)
-    } catch (error) {
-      console.error('Get user error', error)
-    }
-  }
-  //with axios
-  // async updateUser({ commit }: { commit: Function }, item: object) {
-  //   try {
-  //     const response = await axios.put(`https://reqres.in/api/users/${item.id}`, item)
-  //     commit('UPDATE_USER', response.data)
-  //   } catch (error) {
-  //     console.error('Updating error', error)
-  //   }
-  // }
 
-  //with axios
-  // async deleteUser({ commit }, id: number) {
-  // try {
-  //   await axios.delete(`https://reqres.in/api/users/${id}`)
-  //   commit('DELETE_USER', id)
-  // } catch (error) {
-  //   console.error('Delete error', error)
-  // }
-  // }
+  loadLocalUsers({ commit }: { commit: Function }) {
+    const localUsers: string | null = localStorage.getItem('users')
+    if (localUsers) {
+      commit('SET_USERS', JSON.parse(localUsers))
+      return true
+    }
+  },
+
+  loadLocalUser({ commit, state }: { commit: Function; state: UserState }, userId: number) {
+    const localUsers: string | null = localStorage.getItem('users')
+
+    if (localUsers) {
+      commit('SET_USERS', JSON.parse(localUsers))
+      state.userDetail = state.users.find((user: User): boolean => user.id == userId) as User
+      return true
+    }
+  },
+
+  updateLocalUser({ state }: { state: UserState }, updatedUser: User) {
+    let updatedUsersList: User[] = state.users.map(
+      (item: User): User => (item.id === updatedUser.id ? updatedUser : item)
+    )
+    localStorage.setItem('users', JSON.stringify(updatedUsersList))
+  },
+
+  deleteLocalUser({ state }: { state: UserState }, id: number) {
+    state.users = state.users.filter((user: User): boolean => user.id != id)
+    localStorage.setItem('users', JSON.stringify(state.users))
+  }
 }
 
 export default {

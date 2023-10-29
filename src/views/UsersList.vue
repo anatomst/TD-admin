@@ -32,7 +32,7 @@
       <el-table-column label="Email" prop="email" />
       <el-table-column align="right" width="195">
         <template #default="scope">
-          <el-button size="large" type="info" round @click="toUserDetails(scope.row)"
+          <el-button size="large" type="info" round @click="toUserDetails(scope.row.id)"
             >Edit</el-button
           >
           <el-button
@@ -50,8 +50,9 @@
     <div class="example-pagination-block">
       <el-pagination
         layout="prev, pager, next"
+        :page-size="6"
         :current-page="currentPage"
-        :total="12"
+        :total="search === '' ? users.length : filterTableData.length"
         @current-change="handlePageChange"
       />
     </div>
@@ -64,7 +65,7 @@ import { Search } from '@element-plus/icons-vue'
 import { onMounted, computed, ref } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
-import { getItem, setItem } from '@/helpers/persistanceStorage'
+import type { User } from '@/store/modules/users/types'
 
 const router = useRouter()
 const store = useStore()
@@ -72,45 +73,38 @@ const store = useStore()
 const currentPage = ref(1)
 const search = ref('')
 const tableLayout = ref('auto')
-const users = ref([])
+const users = computed(() => store.state.usersStore.users)
 
 onMounted(loadUsers)
 
 async function loadUsers() {
-  const localUsers = getItem('users')
-  const localMeta = getItem('meta')
+  const localUsers = await store.dispatch('usersStore/loadLocalUsers')
 
-  if (!localUsers || currentPage.value != localMeta?.page) {
-    await store.dispatch('usersStore/getUsersList', currentPage.value)
-    users.value = store.state.usersStore.users
-    setItem('users', store.state.usersStore.users)
-    setItem('meta', store.state.usersStore.meta)
-  } else {
-    users.value = localUsers
+  if (!localUsers) {
+    await store.dispatch('usersStore/getUsersList')
   }
 }
 
 const filterTableData = computed(() =>
-  users.value.filter(
-    (data) => !search.value || data?.first_name.toLowerCase().includes(search.value.toLowerCase())
-  )
+  users.value
+    .filter(
+      (data: User) =>
+        !search.value || data?.first_name.toLowerCase().includes(search.value.toLowerCase())
+    )
+    .slice((currentPage.value - 1) * 6, currentPage.value * 6)
 )
 
 async function handlePageChange(newPage: number) {
   currentPage.value = newPage
-  setItem('users', undefined)
-  await loadUsers()
 }
 
 async function deleteUser(id: number) {
-  users.value = users.value.filter((user) => user.id !== id)
+  await store.dispatch('usersStore/deleteLocalUser', id)
   ElMessage.success('User successfully deleted')
 }
 
-async function toUserDetails(data: object) {
-  setItem('chosenUser', data)
-  await store.commit('usersStore/SET_USER', data)
-  await router.push(`/users/${data.id}`)
+async function toUserDetails(id: number) {
+  await router.push(`/users/${id}`)
 }
 </script>
 
