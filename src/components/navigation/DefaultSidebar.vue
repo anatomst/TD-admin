@@ -7,15 +7,15 @@
       active-text-color="#ff0000"
       background-color="#000"
       class="el-menu-vertical-demo"
-      default-active="1"
       text-color="#fff"
+      :default-active="$route.path"
       router
     >
-      <el-menu-item index="/">
+      <el-menu-item index="/" :route="{ name: 'WelcomePage' }">
         <el-icon :size="25"><HomeFilled /> </el-icon>
         <span style="font-size: var(--el-font-size-extra-large)">Welcome</span>
       </el-menu-item>
-      <el-menu-item index="/users">
+      <el-menu-item index="/users" :route="{ name: 'UsersList' }">
         <el-icon :size="25"><UserFilled /></el-icon>
         <span style="font-size: var(--el-font-size-extra-large)">Users</span>
       </el-menu-item>
